@@ -9,23 +9,28 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
     const savedUser = localStorage.getItem("user");
-    if (savedToken && savedUser) {
+    if (savedToken) {
       setToken(savedToken);
-      setUser(JSON.parse(savedUser));
+      if (savedUser) {
+        setUser(JSON.parse(savedUser));
+      }
     }
   }, []);
 
-  const login = (userData, token) => {
+  const login = (userData, accessToken, refreshToken) => {
     setUser(userData);
-    setToken(token);
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(userData));
+    setToken(accessToken);
+
+    localStorage.setItem("token", accessToken);
+    if (refreshToken) localStorage.setItem("refresh", refreshToken);
+    if (userData) localStorage.setItem("user", JSON.stringify(userData));
   };
 
   const logout = () => {
     setUser(null);
     setToken(null);
     localStorage.removeItem("token");
+    localStorage.removeItem("refresh");
     localStorage.removeItem("user");
   };
 

@@ -2,7 +2,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .models import Order, OrderItem
-from .serializers import OrderSerializer, OrderItemSerializer
+from .serializers import OrderSerializer
 from products.models import Product
 
 class OrderViewSet(viewsets.ModelViewSet):

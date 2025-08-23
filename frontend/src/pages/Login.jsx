@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { loginUser } from "../api/api";
+import { loginUser, getUserProfile } from "../api/api"; // <-- add getUserProfile
 import Input from "../components/auth/Input";
 import Button from "../components/auth/Button";
 
@@ -23,15 +23,17 @@ function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await loginUser(credentials);
-      
-      // Axios returns response object with data inside
-      const data = response.data;
+      // Request JWT tokens from backend
+      const response = await loginUser(credentials); 
+      const { access, refresh } = response.data;
 
-      // Update AuthContext with user and token
-      login(data.user, data.token);
+      // Option 1: Fetch user profile from backend
+      const profileRes = await getUserProfile(access);
+      const userData = profileRes.data;
 
-      // Redirect to menu or dashboard
+      // Save into AuthContext
+      login(userData, access, refresh);
+
       navigate("/menu");
     } catch (err) {
       console.error(err);
@@ -43,7 +45,7 @@ function LoginPage() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
-      <div className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md">
+      <div className="bg-rose-400 shadow-lg rounded-2xl p-8 w-full max-w-md">
         <h2 className="text-2xl font-bold text-center text-rose-600 mb-6">
           Login
         </h2>

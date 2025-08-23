@@ -1,15 +1,17 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
-import AuthContext, { useAuth } from "../contexts/AuthContext";
 
-function ProtectedRoute({ children }) {
-  const { isAuthenticated } = useAuth();
+const ProtectedRoute = ({ children }) => {
+  // Example: check if token exists in localStorage
+  const token = localStorage.getItem("token");
 
-  if (!isAuthenticated) {
+  if (!token) {
+    // Redirect to login if not logged in
     return <Navigate to="/login" replace />;
   }
 
+  // Otherwise, render the protected page
   return children;
-}
+};
 
 export default ProtectedRoute;

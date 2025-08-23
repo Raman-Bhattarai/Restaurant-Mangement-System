@@ -14,6 +14,7 @@ import Orders from "../pages/Orders";
 import Report from "../pages/Report";
 import Customer from "../pages/Customer";
 import Staff from "../pages/Staff";
+import Cart from "../pages/Cart";
 
 function AppRoutes() {
   // State to manage cart sidebar visibility
@@ -34,7 +35,6 @@ function AppRoutes() {
 
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/menu" element={<Menu />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -45,6 +45,22 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <Orders />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/cart"
+          element={
+            <ProtectedRoute>
+              <Cart />
             </ProtectedRoute>
           }
         />

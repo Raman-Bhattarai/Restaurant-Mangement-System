@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Menu } from "lucide-react";
 import AuthContext from "../../contexts/AuthContext";
 
-function Navbar({ openCart }) {
+function Navbar() {
   const { logout, isAuthenticated } = useContext(AuthContext);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
@@ -32,18 +32,21 @@ function Navbar({ openCart }) {
             <div className="hidden md:flex space-x-6 items-center">
               <Link to="/" className="text-gray-700 hover:text-rose-600">Home</Link>
               <Link to="/menu" className="text-gray-700 hover:text-rose-600">Menu</Link>
+              <Link to="/cart" className="text-gray-700 hover:text-rose-600">Cart</Link>
+
+              <button
+                onClick={handleOrdersClick}
+                className="text-gray-700 hover:text-rose-600"
+              >
+                Orders
+              </button>
   
               {isAuthenticated ? (
                 <>
-                  <button
-                    onClick={handleOrdersClick}
-                    className="text-gray-700 hover:text-rose-600"
-                  >
-                    Orders
-                  </button>
+                  
                   <button
                     onClick={logout}
-                    className="bg-red-500 px-4 py-2 rounded text-white hover:bg-red-600"
+                    className="bg-red-500 px-2 py-1 rounded text-white hover:bg-red-600"
                   >
                     Logout
                   </button>
@@ -55,12 +58,12 @@ function Navbar({ openCart }) {
                 </>
               )}
   
-              <button
+              {/* <button
                 onClick={openCart}
                 className="bg-rose-600 text-white px-2 py-1 rounded hover:bg-rose-700"
               >
                 Cart
-              </button>
+              </button> */}
             </div>
   
 
@@ -81,7 +84,7 @@ function Navbar({ openCart }) {
   
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden bg-white shadow-md">
+          <div className="px-[40%] md:hidden bg-white shadow-md">
             <Link
               to="/"
               className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
@@ -95,6 +98,13 @@ function Navbar({ openCart }) {
               onClick={() => setMobileMenuOpen(false)}
             >
               Menu
+            </Link>
+            <Link
+              to="/cart"
+              className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Cart
             </Link>
   
             {isAuthenticated ? (
@@ -136,13 +146,6 @@ function Navbar({ openCart }) {
                 </Link>
               </>
             )}
-  
-            <button
-              onClick={() => setMobileMenuOpen(false)}
-              className="block w-full text-left px-4 py-2 text-white bg-rose-600 hover:bg-rose-700"
-            >
-              Cart
-            </button>
           </div>
         )}
       </nav>

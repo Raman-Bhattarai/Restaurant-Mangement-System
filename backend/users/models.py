@@ -4,15 +4,6 @@ from django.db import models
 class User(AbstractUser):
     phone = models.CharField(max_length=20, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
-    is_staff = models.BooleanField(default=False)
 
     def __str__(self):
         return self.username
-    
-    def is_staff_member(self):
-        return self.is_staff
-
-    class Meta:
-        verbose_name = 'User'
-        verbose_name_plural = 'Users'
-        ordering = ['username']

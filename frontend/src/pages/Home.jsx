@@ -41,7 +41,7 @@ function HomePage() {
       </div>
 
       {/* Call-to-Action Section */}
-      <div className="bg-gray-100 py-16 text-center">
+      <div className="bg-red-400 py-16 text-center">
         <h2 className="text-3xl font-bold mb-4">Ready to Order?</h2>
         <p className="text-gray-700 mb-6">
           Browse our menu and place your order online. Fast, convenient, and delicious!

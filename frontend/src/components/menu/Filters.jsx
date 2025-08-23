@@ -8,12 +8,12 @@ function Filters({ categories, selectedCategory, onCategoryChange, searchTerm, o
       <select
         value={selectedCategory}
         onChange={(e) => onCategoryChange(e.target.value)}
-        className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-rose-400"
+        className="px-4 py-1 border rounded-lg focus:ring-2 focus:ring-rose-400 bg-red-700"
       >
         <option value="">All Categories</option>
         {categories.map((cat) => (
-          <option key={cat} value={cat}>
-            {cat}
+          <option key={cat.id} value={cat.id}>
+            {cat.name}
           </option>
         ))}
       </select>

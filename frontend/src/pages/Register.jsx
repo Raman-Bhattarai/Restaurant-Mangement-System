@@ -46,8 +46,18 @@ function RegisterPage() {
       alert("Registration successful!");
       navigate("/login"); // redirect to login
     } catch (err) {
-      console.error(err);
-      setError("Registration failed. Try again.");
+      if (err.response && err.response.data) {
+        const errors = err.response.data;
+        if (errors.username) {
+          setError(`Username: ${errors.username[0]}`);
+        } else if (errors.email) {
+          setError(`Email: ${errors.email[0]}`);
+        } else {
+          setError("Registration failed. Try again.");
+        }
+      } else {
+        setError("Something went wrong.");
+      }
     } finally {
       setLoading(false);
     }
@@ -55,7 +65,7 @@ function RegisterPage() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
-      <div className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md">
+      <div className="bg-rose-400 shadow-lg rounded-2xl p-8 w-full max-w-md">
         <h2 className="text-2xl font-bold text-center text-rose-600 mb-6">
           Register
         </h2>
