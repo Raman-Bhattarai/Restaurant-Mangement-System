@@ -27,7 +27,7 @@ function CustomerPage() {
       <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Customers</h1>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white rounded-xl shadow">
+        <table className="min-w-full bg-sky-300 rounded-xl shadow">
           <thead>
             <tr className="border-b">
               <th className="p-3 text-left">Username</th>
@@ -38,7 +38,7 @@ function CustomerPage() {
           </thead>
           <tbody>
             {customers.map((c) => (
-              <tr key={c.id} className="border-b hover:bg-gray-50">
+              <tr key={c.id} className="border-b">
                 <td className="p-3">{c.username}</td>
                 <td className="p-3">{c.email}</td>
                 <td className="p-3">{c.phone}</td>

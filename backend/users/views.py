@@ -8,12 +8,15 @@ from .serializers import RegisterSerializer, UserSerializer
 from rest_framework.generics import ListAPIView
 from rest_framework.decorators import api_view, permission_classes
 
+
+# Register endpoint
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = [AllowAny]
     serializer_class = RegisterSerializer
 
 
+# Custom Login using simplejwt
 class LoginView(generics.GenericAPIView):
     permission_classes = [AllowAny]
 
@@ -27,19 +30,16 @@ class LoginView(generics.GenericAPIView):
 
         refresh = RefreshToken.for_user(user)
         return Response({
-            "user": {
-                "id": user.id,
-                "username": user.username,
-                "email": user.email,
-                "phone": user.phone,
-                "address": user.address,
-            },
-            "token": str(refresh.access_token),
+            "user": UserSerializer(user).data,
+            "access": str(refresh.access_token),
             "refresh": str(refresh),
-        })
+        }, status=status.HTTP_200_OK)
 
 
+# Logout (blacklist refresh token)
 class LogoutView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
         try:
             refresh_token = request.data.get("refresh")
@@ -48,26 +48,27 @@ class LogoutView(generics.GenericAPIView):
             return Response({"message": "Logged out successfully"}, status=status.HTTP_200_OK)
         except Exception:
             return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
-    
 
-# Customers endpoint
+
+# Customers endpoint (admin only)
 class CustomerListView(ListAPIView):
     serializer_class = UserSerializer
-    permission_classes = [IsAdminUser]  # only admins can view customers
+    permission_classes = [IsAdminUser]
 
     def get_queryset(self):
-        return User.objects.filter(is_staff=False)  # Only customers
+        return User.objects.filter(is_staff=False)
 
 
-# Staff endpoint
+# Staff endpoint (admin only)
 class StaffListView(ListAPIView):
     serializer_class = UserSerializer
-    permission_classes = [IsAdminUser]  # only admins can view staff
+    permission_classes = [IsAdminUser]
 
     def get_queryset(self):
-        return User.objects.filter(is_staff=True)  # Only staff
-    
-    
+        return User.objects.filter(is_staff=True)
+
+
+# Get currently authenticated user
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def current_user(request):

@@ -8,10 +8,11 @@ function ReportPage() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const data = await getOrders();
-        setOrders(data);
+        const res = await getOrders();
+        setOrders(Array.isArray(res.data) ? res.data : []); // ensure array
       } catch (err) {
         console.error(err);
+        setOrders([]);
       } finally {
         setLoading(false);
       }
@@ -19,45 +20,63 @@ function ReportPage() {
     fetchOrders();
   }, []);
 
-  const totalSales = orders.reduce((acc, order) => acc + order.total, 0);
-  const totalOrders = orders.length;
+  // Filter only completed orders
+  const completedOrders = orders.filter(order => order.status === "COMPLETED");
 
-  if (loading) return <p className="text-center mt-20">Loading report...</p>;
+  const totalSales = completedOrders.reduce(
+    (acc, order) => acc + Number(order.total_price || 0),
+    0
+  );
+
+  const totalOrders = completedOrders.length;
+
+  if (loading) return <p className="text-center mt-20 text-black">Loading report...</p>;
 
   return (
-    <div className="p-6  pt-16">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Reports</h1>
+    <div className="p-6 pt-16">
+      <h1 className="text-3xl font-bold text-black mb-6 text-center">Reports</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
-        <div className="bg-white p-6 rounded-xl shadow text-center">
-          <h2 className="text-xl font-semibold">Total Orders</h2>
-          <p className="text-2xl font-bold mt-2">{totalOrders}</p>
+        <div className="bg-gray-100 p-6 rounded-xl shadow text-center">
+          <h2 className="text-xl font-semibold text-black">Total Orders</h2>
+          <p className="text-2xl font-bold mt-2 text-black">{totalOrders}</p>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow text-center">
-          <h2 className="text-xl font-semibold">Total Sales</h2>
-          <p className="text-2xl font-bold mt-2">${totalSales.toFixed(2)}</p>
+        <div className="bg-gray-100 p-6 rounded-xl shadow text-center">
+          <h2 className="text-xl font-semibold text-black">Total Sales</h2>
+          <p className="text-2xl font-bold mt-2 text-black">Nrs.{totalSales.toFixed(2)}</p>
         </div>
       </div>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white rounded-xl shadow">
-          <thead>
-            <tr className="border-b">
-              <th className="p-3 text-left">Order ID</th>
-              <th className="p-3 text-left">Customer</th>
-              <th className="p-3 text-left">Total</th>
-              <th className="p-3 text-left">Status</th>
+        <table className="min-w-full bg-gray-50 rounded-xl shadow">
+          <thead className="bg-gray-200">
+            <tr>
+              <th className="p-3 text-left text-black">Order ID</th>
+              <th className="p-3 text-left text-black">Customer</th>
+              <th className="p-3 text-left text-black">Total</th>
+              <th className="p-3 text-left text-black">Status</th>
             </tr>
           </thead>
           <tbody>
-            {orders.map((order) => (
-              <tr key={order.id} className="border-b hover:bg-gray-50">
-                <td className="p-3">{order.id}</td>
-                <td className="p-3">{order.customer.username}</td>
-                <td className="p-3">${order.total.toFixed(2)}</td>
-                <td className="p-3">{order.status}</td>
+            {completedOrders.map((order) => (
+              <tr key={order.id} className="border-b hover:bg-gray-100">
+                <td className="p-3 text-black">{order.id}</td>
+                <td className="p-3 text-black">{order.customer?.username}</td>
+                <td className="p-3 text-black">Nrs.{Number(order.total_price).toFixed(2)}</td>
+                <td className="p-3">
+                  <span className="px-2 py-1 rounded-full text-white bg-green-600">
+                    {order.status}
+                  </span>
+                </td>
               </tr>
             ))}
+            {completedOrders.length === 0 && (
+              <tr>
+                <td colSpan="4" className="p-3 text-center text-black">
+                  No completed orders found.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

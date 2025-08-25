@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Input from "../components/auth/Input";
 import Button from "../components/auth/Button";
-import { registerUser } from "../api/api";
+import { registerUser, loginUser, getUserProfile } from "../api/api";
+import { useAuth } from "../contexts/AuthContext";
 
 function RegisterPage() {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const [form, setForm] = useState({
     username: "",
@@ -33,30 +35,60 @@ function RegisterPage() {
     }
 
     setLoading(true);
+
     try {
-      const response = await registerUser({
+      // Prepare payload with optional fields only if non-empty
+      const payload = {
         username: form.username,
         email: form.email,
         password: form.password,
-        phone: form.phone,
-        address: form.address,
+      };
+      if (form.phone.trim()) payload.phone = form.phone.trim();
+      if (form.address.trim()) payload.address = form.address.trim();
+
+      // 1️⃣ Register user
+      await registerUser(payload);
+
+      // 2️⃣ Auto login
+      const loginRes = await loginUser({
+        username: form.username,
+        password: form.password,
       });
 
-      console.log("Registered user:", response.data);
-      alert("Registration successful!");
-      navigate("/login"); // redirect to login
+      const { access, refresh } = loginRes.data;
+
+      // 3️⃣ Store tokens in localStorage
+      localStorage.setItem("access_token", access);
+      localStorage.setItem("refresh_token", refresh);
+
+      // 4️⃣ Fetch profile
+      const profileRes = await getUserProfile();
+      const userData = profileRes.data;
+
+      // 5️⃣ Set role for Navbar
+      login(
+        {
+          ...userData,
+          role: userData.is_staff ? "staff" : "customer",
+        },
+        access,
+        refresh
+      );
+
+      // 6️⃣ Redirect to menu/home
+      navigate("/menu");
     } catch (err) {
+      console.error("Registration error:", err.response?.data || err);
+
+      // Extract detailed error messages from backend
       if (err.response && err.response.data) {
         const errors = err.response.data;
-        if (errors.username) {
-          setError(`Username: ${errors.username[0]}`);
-        } else if (errors.email) {
-          setError(`Email: ${errors.email[0]}`);
-        } else {
-          setError("Registration failed. Try again.");
-        }
+        if (errors.username) setError(`Username: ${errors.username[0]}`);
+        else if (errors.email) setError(`Email: ${errors.email[0]}`);
+        else if (errors.password) setError(`Password: ${errors.password[0]}`);
+        else setError("Registration failed. Try again.");
       } else {
-        setError("Something went wrong.");
+        setError("Something went wrong. Please try again.");
       }
     } finally {
       setLoading(false);
@@ -105,13 +137,13 @@ function RegisterPage() {
             required
           />
           <Input
-            label="Phone"
+            label="Phone (optional)"
             name="phone"
             value={form.phone}
             onChange={handleChange}
           />
           <Input
-            label="Address"
+            label="Address (optional)"
             name="address"
             value={form.address}
             onChange={handleChange}
